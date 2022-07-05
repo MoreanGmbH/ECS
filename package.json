@@ -1,0 +1,11 @@
+{
+  "name": "de.morean.entitas",
+  "version": "1.0.0",
+  "displayName": "ECS",
+  "description": "",
+  "unity": "2021.3",
+  "unityRelease": "5f1",
+  "author": {
+    "name": "Morean"
+  }
+}
