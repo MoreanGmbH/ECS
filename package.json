@@ -7,8 +7,5 @@
   "unityRelease": "5f1",
   "author": {
     "name": "Morean"
-  },
-  "dependencies": {
-    "de.morean.entitas": "git@github.com:Morean-Studio/Entitas.git"
   }
 }
