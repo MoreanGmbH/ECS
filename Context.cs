@@ -13,9 +13,6 @@ namespace Morean.ECS
     {
         #region Context
 
-        public static readonly Contexts Contexts = Contexts.sharedInstance;
-        public static readonly IContext[] AllContexts = Contexts.allContexts;
-
         private static string contextCreateEntityMethod = "CreateEntity";
         private static string contextGetEntitiesMethod = "GetEntities";
 
@@ -136,7 +133,7 @@ namespace Morean.ECS
             {
                 var serializedContext = serializedContexts[i];
 
-                Array.Find(AllContexts, c => c.ToString() == serializedContext.Context)
+                Array.Find(Contexts.sharedInstance.allContexts, c => c.ToString() == serializedContext.Context)
                     .CreateEntities(serializedContext.Entities);
             }
         }
