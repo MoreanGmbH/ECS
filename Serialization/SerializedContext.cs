@@ -1,4 +1,5 @@
-﻿namespace Morean.ECS
+﻿#if ECS
+namespace ECS
 {
     /// <summary>
     /// Structure to be used when serializing / deserializing an entity to / from json.
@@ -16,3 +17,5 @@
         public Entitas.IComponent[][] Entities;
     }
 }
+
+#endif

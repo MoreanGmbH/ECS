@@ -1,4 +1,5 @@
-namespace Morean
+#if ECS
+namespace ECS
 {
     public class LifeCycle
     {
@@ -61,4 +62,5 @@ namespace Morean
             contexts.Reset();
         }
     }
-}
+} 
+#endif

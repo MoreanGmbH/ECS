@@ -1,8 +1,9 @@
-﻿using Entitas;
+﻿#if ECS
+using Entitas;
 using System;
 using System.Collections.Generic;
 
-namespace Morean.ECS
+namespace ECS
 {
     /// <summary>
     /// Provides <see cref="Entitas.Entity"/> related utilities such as
@@ -130,4 +131,5 @@ namespace Morean.ECS
 
         #endregion Components
     }
-}
+} 
+#endif

@@ -1,9 +1,10 @@
-﻿using Entitas;
+﻿#if ECS
+using Entitas;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace Morean.ECS
+namespace ECS
 {
     /// <summary>
     /// Provides <see cref="IContexts"/> related utilities such as creating entities
@@ -140,4 +141,5 @@ namespace Morean.ECS
 
         #endregion Serialization / Deserialization
     }
-}
+} 
+#endif

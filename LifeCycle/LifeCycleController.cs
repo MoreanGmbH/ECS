@@ -1,4 +1,5 @@
-namespace Morean
+#if ECS
+namespace ECS
 {
     public class LifeCycleController : UnityEngine.MonoBehaviour
     {
@@ -38,5 +39,6 @@ namespace Morean
         /// Tear down <see cref="LifeCycle"/>.
         /// </summary>
         private void OnApplicationQuit() => lifeCycle.TearDown();
-    } 
-}
+    }
+} 
+#endif
