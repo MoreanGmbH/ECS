@@ -20,13 +20,13 @@ namespace ECS
         /// <summary>
         /// Create <see cref="IEntity"/> in <paramref name="context"/>.
         /// </summary>
-        internal static IEntity CreateEntity(this IContext context)
+        public static IEntity CreateEntity(this IContext context)
             => (IEntity)context.GetType().GetMethod(contextCreateEntityMethod).Invoke(context, null);
 
         /// <summary>
         /// Get <see cref="IEntity"/> colleciton in <paramref name="context"/>.
         /// </summary>
-        internal static IEntity[] GetEntities(this IContext context)
+        public static IEntity[] GetEntities(this IContext context)
             => (IEntity[])context.GetType().GetMethod(contextGetEntitiesMethod).Invoke(context, null);
 
         #endregion Context
@@ -36,7 +36,7 @@ namespace ECS
         /// <summary>
         /// Create <see cref="IEntity"/> collection in <paramref name="context"/>.
         /// </summary>
-        internal static void CreateEntities(this IContext context, params IComponent[][] entities)
+        public static void CreateEntities(this IContext context, params IComponent[][] entities)
         {
             var createdEntities = context.CreateEntities(entities.Length);
             for (int i = 0; i < createdEntities.Length; i++)
@@ -49,20 +49,20 @@ namespace ECS
         /// Create <see cref="IEntity"/> in <paramref name="context"/>
         /// and add <paramref name="components"/>.
         /// </summary>
-        internal static void CreateEntity(this IContext context, params IComponent[] components)
+        public static void CreateEntity(this IContext context, params IComponent[] components)
             => context.CreateEntity().AddComponents(components);
 
         /// <summary>
         /// Create <see cref="IEntity"/> in <paramref name="context"/>
         /// and add <see cref="IComponent"/>s from <paramref name="componentIndices"/>.
         /// </summary>
-        internal static void CreateEntity(this IContext context, params int[] componentIndices)
+        public static void CreateEntity(this IContext context, params int[] componentIndices)
             => context.CreateEntity().AddComponents(componentIndices);
 
         /// <summary>
         /// Create <see cref="IEntity"/> collection in <paramref name="context"/>.
         /// </summary>
-        internal static IEntity[] CreateEntities(this IContext context, int count)
+        public static IEntity[] CreateEntities(this IContext context, int count)
         {
             var entities = new IEntity[count];
             var creationMethod = context.GetType().GetMethod(contextCreateEntityMethod);

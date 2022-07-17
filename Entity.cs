@@ -16,7 +16,7 @@ namespace ECS
         /// <summary>
         /// Add <paramref name="components"/> to <paramref name="entity"/>.
         /// </summary>
-        internal static void AddComponents(this IEntity entity, params IComponent[] components)
+        public static void AddComponents(this IEntity entity, params IComponent[] components)
         {
             var componentTypes = entity.contextInfo.componentTypes;
             for (int i = 0; i < components.Length; i++)
@@ -35,7 +35,7 @@ namespace ECS
         /// Add components matched by <paramref name="indices"/> to <paramref name="entity"/>.
         /// </summary>
         /// <param name="indices">Component indices in the <paramref name="componentTypes"/>.</param>
-        internal static void AddComponents(this IEntity entity, int[] indices)
+        public static void AddComponents(this IEntity entity, int[] indices)
         {
             var componentTypes = entity.contextInfo.componentTypes;
             for (int i = 0; i < indices.Length; i++)
@@ -53,7 +53,7 @@ namespace ECS
         /// <summary>
         /// Replace <paramref name="components"/> to <paramref name="entity"/>.
         /// </summary>
-        internal static void ReplaceComponents(this IEntity entity, params IComponent[] components)
+        public static void ReplaceComponents(this IEntity entity, params IComponent[] components)
         {
             var componentTypes = entity.contextInfo.componentTypes;
             for (int i = 0; i < components.Length; i++)
@@ -69,30 +69,30 @@ namespace ECS
         }
 
         /// <summary>
-        /// Subtract <paramref name="entities"/> components from defined <paramref name="indices"/>.
+        /// Subtract components with <paramref name="indices"/> from <paramref name="entities"/>.
         /// </summary>
-        internal static List<IComponent> SubtractComponents(this IEntity[] entities, params int[] indices)
+        public static List<IComponent> SubtractComponents(this IEntity[] entities, params int[] indices)
         {
-            var subractedComponents = new List<IComponent>();
+            var remainderComponents = new List<IComponent>();
             for (int i = 0; i < entities.Length; i++)
             {
-                subractedComponents.AddRange(
+                remainderComponents.AddRange(
                     entities[i].SubtractComponents(indices));
             }
 
-            return subractedComponents;
+            return remainderComponents;
         }
 
         /// <summary>
-        /// Subtract <paramref name="entity"/> components from defined <paramref name="indices"/>.
+        /// Subtract components with <paramref name="indices"/> from <paramref name="entity"/>.
         /// </summary>
-        internal static IComponent[] SubtractComponents(this IEntity entity, params int[] indices)
+        public static IComponent[] SubtractComponents(this IEntity entity, params int[] indices)
         {
-            var entityIndices = entity.GetComponentIndices();
-            var subractedIndices = new List<int>();
-            for (var i = 0; i < entityIndices.Length; i++)
+            var componentIndices = entity.GetComponentIndices();
+            var remainderIndices = new List<int>();
+            for (var i = 0; i < componentIndices.Length; i++)
             {
-                var entityIndex = entityIndices[i];
+                var entityIndex = componentIndices[i];
                 var found = false;
                 for (var j = 0; j < indices.Length; j++)
                 {
@@ -104,21 +104,21 @@ namespace ECS
                 }
                 if (!found)
                 {
-                    subractedIndices.Add(entityIndex);
+                    remainderIndices.Add(entityIndex);
                 }
             }
 
-            var subractedComponents = new IComponent[subractedIndices.Count];
-            for (int i = 0; i < subractedIndices.Count; i++)
+            var remainderComponents = new IComponent[remainderIndices.Count];
+            for (int i = 0; i < remainderIndices.Count; i++)
             {
-                var index = subractedIndices[i];
-                subractedComponents[i] = entity.GetComponent(index);
+                var index = remainderIndices[i];
+                remainderComponents[i] = entity.GetComponent(index);
             }
 
-            return subractedComponents;
+            return remainderComponents;
         }
 
-        internal static int[] Indices(this IEntity entity, params IComponent[] components)
+        public static int[] Indices(this IEntity entity, params IComponent[] components)
         {
             var indices = new List<int>();
             var componentTypes = entity.contextInfo.componentTypes;
