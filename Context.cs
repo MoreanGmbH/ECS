@@ -1,8 +1,10 @@
 ﻿#if ECS
+using Asset;
 using Entitas;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ECS
 {
@@ -81,7 +83,7 @@ namespace ECS
         /// Serialize all entities in <paramref name="contexts"/> to Json.
         /// </summary>
         /// <param name="formatting">Json formatting.</param>
-        public static string Serialize(Formatting formatting = Formatting.None, params IContext[] contexts)
+        public static string SerializeEntities(Formatting formatting = Formatting.None, params IContext[] contexts)
         {
             var serializedContexts = new SerializedContext[contexts.Length];
             for (int i = 0; i < serializedContexts.Length; i++)
@@ -120,10 +122,12 @@ namespace ECS
         }
 
         /// <summary>
-        /// Deserialize and create entities from Json <paramref name="data"/>.
+        /// Load entities from Json addressable with <paramref name="key"/>.
         /// </summary>
-        public static void Deserialize(string data)
+        public static async void LoadEntities(string key)
         {
+            var data = (await key.LoadAsset<UnityEngine.TextAsset>()).text;
+
             var serializedContexts = JsonConvert.DeserializeObject<SerializedContext[]>(data,
                 new JsonSerializerSettings
                 {
@@ -141,5 +145,5 @@ namespace ECS
 
         #endregion Serialization / Deserialization
     }
-} 
+}
 #endif
