@@ -4,7 +4,7 @@ namespace ECS
     /// <summary>
     /// Structure to be used when serializing / deserializing an entity to / from json.
     /// </summary>
-    internal struct SerializedContext
+    public struct ContextData
     {
         /// <summary>
         /// Entity's context name, to be matched to the actual <see cref="Entitas.IContext"/>.

@@ -80,16 +80,28 @@ namespace ECS
         #region Serialization / Deserialization
 
         /// <summary>
+        /// Deserialize contexts from Json data and create their entities.
+        /// </summary>
+        public static void LoadEntities(string data)
+        {
+            foreach (var context in DeserializeContexs(data))
+            {
+                Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == context.Context)
+                    .CreateEntities(context.Entities);
+            }
+        }
+
+        /// <summary>
         /// Serialize all entities in <paramref name="contexts"/> to Json.
         /// </summary>
         /// <param name="formatting">Json formatting.</param>
-        public static string SerializeEntities(Formatting formatting = Formatting.None, params IContext[] contexts)
+        public static string SerializeContexts(Formatting formatting = Formatting.None, params IContext[] contexts)
         {
-            var serializedContexts = new SerializedContext[contexts.Length];
+            var serializedContexts = new ContextData[contexts.Length];
             for (int i = 0; i < serializedContexts.Length; i++)
             {
                 var context = contexts[i];
-                var serializedContext = new SerializedContext();
+                var serializedContext = new ContextData();
                 serializedContext.Context = context.contextInfo.name;
 
                 var entities = context.GetEntities();
@@ -122,26 +134,15 @@ namespace ECS
         }
 
         /// <summary>
-        /// Load entities from Json addressable with <paramref name="key"/>.
+        /// Deserialize <see cref="ContextData"/> from json data.
         /// </summary>
-        public static async void LoadEntities(string key)
-        {
-            var data = (await key.LoadAsset<UnityEngine.TextAsset>()).text;
-
-            var serializedContexts = JsonConvert.DeserializeObject<SerializedContext[]>(data,
+        public static ContextData[] DeserializeContexs(string data)
+            => JsonConvert.DeserializeObject<ContextData[]>(data,
                 new JsonSerializerSettings
                 {
-                    TypeNameHandling = TypeNameHandling.Auto
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 });
-
-            for (int i = 0; i < serializedContexts.Length; i++)
-            {
-                var serializedContext = serializedContexts[i];
-
-                Array.Find(Contexts.sharedInstance.allContexts, c => c.ToString() == serializedContext.Context)
-                    .CreateEntities(serializedContext.Entities);
-            }
-        }
 
         #endregion Serialization / Deserialization
     }
