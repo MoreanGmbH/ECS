@@ -79,15 +79,20 @@ namespace ECS
 
         #region Serialization / Deserialization
 
+        private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto,
+        };
+
         /// <summary>
         /// Deserialize contexts from Json data and create their entities.
         /// </summary>
         public static void LoadEntities(string data)
         {
-            foreach (var context in DeserializeContexs(data))
+            foreach (var contextData in DeserializeContexs(data))
             {
-                Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == context.Context)
-                    .CreateEntities(context.Entities);
+                Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == contextData.Context)
+                    .CreateEntities(contextData.Entities);
             }
         }
 
@@ -126,23 +131,14 @@ namespace ECS
                 serializedContexts[i] = serializedContext;
             }
 
-            return JsonConvert.SerializeObject(serializedContexts, formatting,
-                new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Auto
-                });
+            return JsonConvert.SerializeObject(serializedContexts, formatting, serializerSettings);
         }
 
         /// <summary>
         /// Deserialize <see cref="ContextData"/> from json data.
         /// </summary>
         public static ContextData[] DeserializeContexs(string data)
-            => JsonConvert.DeserializeObject<ContextData[]>(data,
-                new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Auto,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                });
+            => JsonConvert.DeserializeObject<ContextData[]>(data, serializerSettings);
 
         #endregion Serialization / Deserialization
     }
