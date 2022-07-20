@@ -24,10 +24,10 @@ namespace ECS
         [InfoBox("Json file containing collection of contexts and their entities.", InfoMessageType.None)]
         public string EntitiesDataPath;
 
-        private bool IsValidDataPath() => !string.IsNullOrEmpty(EntitiesDataPath);
+        private bool DataPathIsValid() => !string.IsNullOrEmpty(EntitiesDataPath);
 
         [FoldoutGroup("Load Entities"), PropertySpace(20), Button(ButtonSizes.Large)]
-        [ShowIf("IsValidDataPath")]
+        [ShowIf(nameof(DataPathIsValid))]
         private void LoadEntities()
             => Contexts.AddRange(Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath)));
 

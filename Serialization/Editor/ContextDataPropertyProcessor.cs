@@ -2,12 +2,11 @@
 using Entitas;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
-using System;
 using System.Collections.Generic;
 
 namespace ECS
 {
-    public class ContextDataProcessor : OdinPropertyProcessor<ContextData>
+    public class ContextDataPropertyProcessor : OdinPropertyProcessor<ContextData>
     {
         public override void ProcessMemberProperties(List<InspectorPropertyInfo> propertyInfos)
         {
@@ -25,15 +24,12 @@ namespace ECS
             // Use IContext type for Context property
             propertyInfos.AddValue(nameof(ContextData.Context),
                 // Convert to IContext
-                (ref ContextData contextData) => GetContext(contextData.Context),
+                (ref ContextData contextData) => contextData.GetContext(),
                 // Convert to oritinal Context type
-                (ref ContextData contextData, IContext context) => contextData.Context = context.contextInfo.name,
+                (ref ContextData contextData, IContext context) => contextData.Context = context?.contextInfo.name,
                 // Place where original Context property was
                 new PropertyOrderAttribute(contextPropetyOrder));
         }
-
-        private IContext GetContext(string context)
-            => Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == context);
     }
 }
 #endif

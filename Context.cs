@@ -1,10 +1,8 @@
 ﻿#if ECS
-using Asset;
 using Entitas;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ECS
 {
@@ -30,6 +28,12 @@ namespace ECS
         /// </summary>
         public static IEntity[] GetEntities(this IContext context)
             => (IEntity[])context.GetType().GetMethod(contextGetEntitiesMethod).Invoke(context, null);
+
+        /// <summary>
+        /// Find context by name.
+        /// </summary>
+        public static IContext GetContext(this ContextData data)
+            => Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == data.Context);
 
         #endregion Context
 
@@ -91,8 +95,7 @@ namespace ECS
         {
             foreach (var contextData in DeserializeContexs(data))
             {
-                Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == contextData.Context)
-                    .CreateEntities(contextData.Entities);
+                contextData.GetContext().CreateEntities(contextData.Entities);
             }
         }
 
