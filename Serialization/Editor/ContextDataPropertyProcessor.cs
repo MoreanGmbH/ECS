@@ -1,4 +1,4 @@
-#if ODIN_INSPECTOR
+#if UNITY_EDITOR && ODIN_INSPECTOR
 using Entitas;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -10,13 +10,11 @@ namespace ECS
     {
         public override void ProcessMemberProperties(List<InspectorPropertyInfo> propertyInfos)
         {
-            var contextPropetyOrder = 0;
             for (int i = 0; i < propertyInfos.Count; i++)
             {
                 // Hide original Context property
                 if (propertyInfos[i].PropertyName == nameof(ContextData.Context))
                 {
-                    contextPropetyOrder = i - 1;
                     propertyInfos.RemoveAt(i);
                 }
             }
@@ -28,7 +26,8 @@ namespace ECS
                 // Convert to oritinal Context type
                 (ref ContextData contextData, IContext context) => contextData.Context = context?.contextInfo.name,
                 // Place where original Context property was
-                new PropertyOrderAttribute(contextPropetyOrder));
+                new PropertyOrderAttribute(-1),
+                new InfoBoxAttribute("Null Context is not allowed!", InfoMessageType.Error, "@$value == null"));
         }
     }
 }

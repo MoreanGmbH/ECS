@@ -1,6 +1,6 @@
 ﻿#if ECS
 using Entitas;
-#if ODIN_INSPECTOR
+#if UNITY_EDITOR && ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 using System;
 using System.Linq;
@@ -13,22 +13,25 @@ namespace ECS
     /// </summary>
     public struct ContextData
     {
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [OnValueChanged(nameof(ContextUpdated), true)]
+#endif
         /// <summary>
         /// Entity's context name, to be matched to the actual <see cref="IContext"/>.
         /// </summary>
         public string Context;
 
-        /// <summary>
-        /// Array of entity's components.
-        /// </summary>
-#if ODIN_INSPECTOR
+#if UNITY_EDITOR && ODIN_INSPECTOR
         [ShowIf(nameof(ContextIsValid))]
 
+        [InfoBox("Context must have at least one Entity!", InfoMessageType.Error,
+            nameof(invalidEntities))]
+
         [InfoBox("Null and Empty Entities are not allowed!", InfoMessageType.Error,
-            nameof(nullEntities))]
+            nameof(invalidEntity))]
 
         [InfoBox("Null Components are not allowed!", InfoMessageType.Error,
-            nameof(nullComponents))]
+            nameof(nullComponent))]
 
         [InfoBox("Component doesn't belong to selected Context!", InfoMessageType.Error,
             nameof(componentNotInContext))]
@@ -36,31 +39,62 @@ namespace ECS
         [InfoBox("Only one Component Type per Entity is allowed!", InfoMessageType.Error,
             nameof(duplicateComponents))]
 
-        [OnValueChanged(nameof(OnComponentAdded), true)]
+        [OnValueChanged(nameof(Validate), true)]
 #endif
+        /// <summary>
+        /// Array of entity's components.
+        /// </summary>
         public IComponent[][] Entities;
 
-#if ODIN_INSPECTOR
+#if UNITY_EDITOR && ODIN_INSPECTOR
         private bool ContextIsValid() => !string.IsNullOrEmpty(Context);
 
-        private bool nullEntities;
-        private bool nullComponents;
+        private bool invalidContext;
+        private bool invalidEntities;
+        private bool invalidEntity;
+        private bool nullComponent;
         private bool componentNotInContext;
         private bool duplicateComponents;
 
-        private void OnComponentAdded()
+        private void ContextUpdated()
         {
-            nullEntities = false;
-            nullComponents = false;
+            if (string.IsNullOrEmpty(Context))
+            {
+                Context = Contexts.sharedInstance.allContexts[0].contextInfo.name;
+            }
+
+            Entities = new IComponent[1][];
+        }
+
+        private void Validate()
+        {
+            invalidContext = false;
+            invalidEntities = false;
+            invalidEntity = false;
+            nullComponent = false;
             componentNotInContext = false;
             duplicateComponents = false;
+
+            // Verify that context is not null
+            if (string.IsNullOrEmpty(Context))
+            {
+                invalidContext = true;
+                return;
+            }
+
+            // Verify that there's at least one entity
+            if (Entities == null || Entities.Length < 1)
+            {
+                invalidEntities = true;
+                return;
+            };
 
             foreach (var entity in Entities)
             {
                 // Verify that there are no null or empty entities
                 if (entity == null || entity.Length < 1)
                 {
-                    nullEntities = true;
+                    invalidEntity = true;
                     return;
                 };
 
@@ -69,7 +103,7 @@ namespace ECS
                     // Verify that component is not null
                     if (component == null)
                     {
-                        nullComponents = true;
+                        nullComponent = true;
                         return;
                     }
 

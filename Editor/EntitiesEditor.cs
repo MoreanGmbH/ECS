@@ -5,6 +5,8 @@ using Sirenix.Utilities.Editor;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using System.Collections.Generic;
+using Entitas;
+using System;
 
 namespace ECS
 {
@@ -29,14 +31,36 @@ namespace ECS
         [FoldoutGroup("Load Entities"), PropertySpace(20), Button(ButtonSizes.Large)]
         [ShowIf(nameof(DataPathIsValid))]
         private void LoadEntities()
-            => Contexts.AddRange(Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath)));
+            => ContextsData.AddRange(Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath)));
+
+        [PropertySpace(20), Button(ButtonSizes.Large)]
+        [ShowIf(nameof(DataPathIsValid))]
+        private void SaveEntities()
+            => ContextsData.AddRange(Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath)));
 
         #endregion
 
         #region Entities
 
         [PropertySpace(20)]
-        public List<ContextData> Contexts = new List<ContextData>();
+        [ListDrawerSettings(CustomAddFunction = nameof(AddDefaultContext))]
+        public List<ContextData> ContextsData = new List<ContextData>();
+
+        private ContextData AddDefaultContext()
+        {
+            var firstContext = Contexts.sharedInstance.allContexts[0].contextInfo;
+            return new ContextData()
+            {
+                Context = firstContext.name,
+                Entities = new IComponent[1][]
+                {
+                    new IComponent[]
+                    {
+                        (IComponent)Activator.CreateInstance(firstContext.componentTypes[0])
+                    }
+                }
+            };
+        }
 
         #endregion
     }
