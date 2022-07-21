@@ -57,7 +57,7 @@ namespace ECS
 
             foreach (var entity in Entities)
             {
-                // Verify that there are no null entities
+                // Verify that there are no null or empty entities
                 if (entity == null || entity.Length < 1)
                 {
                     nullEntities = true;
@@ -79,14 +79,21 @@ namespace ECS
                         componentNotInContext = true;
                         return;
                     }
-                }
 
-                // Verify that there are no duplicate components
-                if (entity.GroupBy(v => v).Any(v => v.Count() > 1))
-                //if (entity.Length != entity.Distinct().Count())
-                {
-                    duplicateComponents = true;
-                    return;
+                    // Verify that there are no duplicate components
+                    var componentTypeCount = 0;
+                    foreach (var otherComponent in entity)
+                    {
+                        if (otherComponent.GetType() == component.GetType())
+                        {
+                            componentTypeCount++;
+                        }
+                        if (componentTypeCount > 1)
+                        {
+                            duplicateComponents = true;
+                            return;
+                        }
+                    }
                 }
             }
         }
