@@ -44,6 +44,7 @@ namespace ECS
 
         [PropertySpace(20)]
         [ListDrawerSettings(CustomAddFunction = nameof(AddDefaultContext))]
+        [LabelText(nameof(Contexts))]
         public List<ContextData> ContextsData = new List<ContextData>();
 
         private ContextData AddDefaultContext()
