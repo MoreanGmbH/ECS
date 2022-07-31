@@ -48,18 +48,26 @@ namespace ECS
 
         private ContextData AddDefaultContext()
         {
-            var firstContext = Contexts.sharedInstance.allContexts[0].contextInfo;
-            return new ContextData()
+            var contextData = new ContextData();
+
+            if (Contexts.sharedInstance.allContexts.Length > 0)
             {
-                Context = firstContext.name,
-                Entities = new IComponent[1][]
+                // Add first context if any
+                var firstContext = Contexts.sharedInstance.allContexts[0].contextInfo;
+                contextData.Context = firstContext.name;
+                // Create entity
+                contextData.Entities = new IComponent[1][];
+                // Add first component to entity if any
+                if (firstContext.componentTypes.Length > 0)
                 {
-                    new IComponent[]
+                    contextData.Entities[0] = new IComponent[]
                     {
                         (IComponent)Activator.CreateInstance(firstContext.componentTypes[0])
-                    }
-                }
-            };
+                    };
+                };
+            }
+
+            return contextData;
         }
 
         #endregion

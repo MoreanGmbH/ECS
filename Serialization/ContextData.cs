@@ -3,6 +3,7 @@ using Entitas;
 #if UNITY_EDITOR && ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 #endif
 
@@ -15,6 +16,7 @@ namespace ECS
     {
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [OnValueChanged(nameof(ContextUpdated), true)]
+        [ValueDropdown("ContextNames")]
 #endif
         /// <summary>
         /// Entity's context name, to be matched to the actual <see cref="IContext"/>.
@@ -22,8 +24,6 @@ namespace ECS
         public string Context;
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
-        [ShowIf(nameof(ContextIsValid))]
-
         [InfoBox("Context must have at least one Entity!", InfoMessageType.Error,
             nameof(invalidEntities))]
 
@@ -47,40 +47,27 @@ namespace ECS
         public IComponent[][] Entities;
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
-        private bool ContextIsValid() => !string.IsNullOrEmpty(Context);
 
-        private bool invalidContext;
         private bool invalidEntities;
         private bool invalidEntity;
         private bool nullComponent;
         private bool componentNotInContext;
         private bool duplicateComponents;
 
-        private void ContextUpdated()
-        {
-            if (string.IsNullOrEmpty(Context))
-            {
-                Context = Contexts.sharedInstance.allContexts[0].contextInfo.name;
-            }
 
-            Entities = new IComponent[1][];
-        }
+        private List<string> ContextNames() 
+            => Contexts.sharedInstance.allContexts
+            .Select(context => context.contextInfo.name).ToList();
+
+        private void ContextUpdated() => Entities = new IComponent[1][];
 
         private void Validate()
         {
-            invalidContext = false;
             invalidEntities = false;
             invalidEntity = false;
             nullComponent = false;
             componentNotInContext = false;
             duplicateComponents = false;
-
-            // Verify that context is not null
-            if (string.IsNullOrEmpty(Context))
-            {
-                invalidContext = true;
-                return;
-            }
 
             // Verify that there's at least one entity
             if (Entities == null || Entities.Length < 1)

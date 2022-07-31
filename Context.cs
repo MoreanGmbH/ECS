@@ -32,8 +32,13 @@ namespace ECS
         /// <summary>
         /// Find context by name.
         /// </summary>
-        public static IContext GetContext(this ContextData data)
-            => Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == data.Context);
+        public static IContext GetContext(this ContextData data) => GetContext(data.Context);
+
+        /// <summary>
+        /// Find context by name.
+        /// </summary>
+        public static IContext GetContext(string context)
+            => Array.Find(Contexts.sharedInstance.allContexts, match => match.ToString() == context);
 
         #endregion Context
 
