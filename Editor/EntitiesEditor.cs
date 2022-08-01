@@ -7,6 +7,7 @@ using Sirenix.Utilities;
 using System.Collections.Generic;
 using Entitas;
 using System;
+using System.Linq;
 
 namespace ECS
 {
@@ -44,56 +45,28 @@ namespace ECS
 
         [PropertySpace(20)]
         [LabelText(nameof(Contexts))]
-        [ListDrawerSettings(CustomAddFunction = nameof(AddDefaultContext))]
-        [InfoBox("Duplicate Contexts are not allowed!", InfoMessageType.Error,
-            nameof(duplicateContexts))]
-        [OnValueChanged(nameof(ValidateContexts), true)]
+        [ValueDropdown(nameof(AvailableContexts), ExcludeExistingValuesInList = true, DrawDropdownForListElements = false)]
         public List<ContextData> ContextsData = new List<ContextData>();
 
-        private bool duplicateContexts;
-
-        private ContextData AddDefaultContext()
+        private ValueDropdownList<ContextData> AvailableContexts()
         {
-            var contextData = new ContextData();
-
-            if (Contexts.sharedInstance.allContexts.Length > 0)
-            {
-                // Add first context if any
-                var firstContext = Contexts.sharedInstance.allContexts[0].contextInfo;
-                contextData.Context = firstContext.name;
-                // Create entity
-                contextData.Entities = new IComponent[1][];
-                // Add first component to entity if any
-                if (firstContext.componentTypes.Length > 0)
+            var contexts = Contexts.sharedInstance.allContexts
+                .Where(context => context.contextInfo.componentTypes.Length > 0)
+                .Select(context => new ContextData()
                 {
-                    contextData.Entities[0] = new IComponent[]
+                    Context = context.contextInfo.name,
+                    Entities = new IComponent[][]
                     {
-                        (IComponent)Activator.CreateInstance(firstContext.componentTypes[0])
-                    };
-                };
-            }
-
-            return contextData;
-        }
-
-        private void ValidateContexts()
-        {
-            duplicateContexts = false;
-
-            for (int i = 0; i < ContextsData.Count; i++)
-            {
-                var context = ContextsData[i];
-                for (int j = 0; j < ContextsData.Count; j++)
-                {
-                    if (i == j) continue;
-
-                    if (context.Context == ContextsData[j].Context)
-                    {
-                        duplicateContexts = true;
-                        return;
+                        new IComponent[] { (IComponent)Activator.CreateInstance(context.contextInfo.componentTypes[0]) }
                     }
-                }
+                });
+
+            var valueDropdownList = new ValueDropdownList<ContextData>();
+            foreach (var context in contexts)
+            {
+                valueDropdownList.Add(context.Context, context);
             }
+            return valueDropdownList;
         }
 
         #endregion

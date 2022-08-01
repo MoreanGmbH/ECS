@@ -15,8 +15,7 @@ namespace ECS
     public struct ContextData
     {
 #if UNITY_EDITOR && ODIN_INSPECTOR
-        [OnValueChanged(nameof(InitializeEntities), true)]
-        [ValueDropdown(nameof(ContextNames))]
+        [PropertyOrder(0), HideLabel, DisplayAsString]
 #endif
         /// <summary>
         /// Entity's context name, to be matched to the actual <see cref="IContext"/>.
@@ -24,31 +23,42 @@ namespace ECS
         public string Context;
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
-        [InfoBox("Component doesn't belong to the selected Context!", InfoMessageType.Error,
-            nameof(componentNotInContext))]
+        [PropertyOrder(1)]
+        [Button(ButtonSizes.Large, ButtonStyle.Box, Expanded = true)]
+        private void AddEntity()
+        {
+            Array.Resize(ref Entities, Entities.Length + 1);
+            ValidateEntities();
+        }
 
+        [PropertyOrder(2), PropertySpace(SpaceAfter = 20), ListDrawerSettings(HideAddButton = true)]
         [InfoBox("Only one Component Type per Entity is allowed!", InfoMessageType.Error,
             nameof(duplicateComponents))]
-
         [OnValueChanged(nameof(ValidateEntities), true)]
+        [ValueDropdown(nameof(Components))]
 #endif
         /// <summary>
-        /// Array of entity's components.
+        /// Entities are collection of components.
         /// </summary>
         public IComponent[][] Entities;
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
-        private bool componentNotInContext;
         private bool duplicateComponents;
 
-        private IEnumerable<string> ContextNames()
-            => Contexts.sharedInstance.allContexts.Select(context => context.contextInfo.name);
+        private IEnumerable<IComponent> Components()
+        {
+            var components = new List<IComponent>();
+            var componentTypes = ECS.Context.GetContext(Context).contextInfo.componentTypes;
 
-        private void InitializeEntities() => Entities = new IComponent[1][];
+            foreach (var componentType in componentTypes)
+            {
+                components.Add((IComponent)Activator.CreateInstance(componentType));
+            }
+            return components;
+        }
 
         private void ValidateEntities()
         {
-            componentNotInContext = false;
             duplicateComponents = false;
 
             for (int i = 0; i < Entities.Length; i++)
@@ -74,20 +84,11 @@ namespace ECS
             {
                 for (int i = 0; i < entity.Length; i++)
                 {
-                    var componentType = entity[i].GetType();
-
-                    // Verify that the component is in context
-                    if (!this.GetContext().contextInfo.componentTypes.Contains(componentType))
-                    {
-                        componentNotInContext = true;
-                        return;
-                    }
-
                     // Verify that there are no duplicate components
                     var componentTypeCount = 0;
                     foreach (var otherComponent in entity)
                     {
-                        if (otherComponent.GetType() == componentType)
+                        if (otherComponent.GetType() == entity[i].GetType())
                         {
                             componentTypeCount++;
                         }
