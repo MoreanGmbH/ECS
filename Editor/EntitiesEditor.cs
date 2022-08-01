@@ -1,4 +1,4 @@
-﻿#if ODIN_INSPECTOR && ECS
+#if ODIN_INSPECTOR && ECS
 using System.IO;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
@@ -43,9 +43,14 @@ namespace ECS
         #region Entities
 
         [PropertySpace(20)]
-        [ListDrawerSettings(CustomAddFunction = nameof(AddDefaultContext))]
         [LabelText(nameof(Contexts))]
+        [ListDrawerSettings(CustomAddFunction = nameof(AddDefaultContext))]
+        [InfoBox("Duplicate Contexts are not allowed!", InfoMessageType.Error,
+            nameof(duplicateContexts))]
+        [OnValueChanged(nameof(ValidateContexts), true)]
         public List<ContextData> ContextsData = new List<ContextData>();
+
+        private bool duplicateContexts;
 
         private ContextData AddDefaultContext()
         {
@@ -69,6 +74,26 @@ namespace ECS
             }
 
             return contextData;
+        }
+
+        private void ValidateContexts()
+        {
+            duplicateContexts = false;
+
+            for (int i = 0; i < ContextsData.Count; i++)
+            {
+                var context = ContextsData[i];
+                for (int j = 0; j < ContextsData.Count; j++)
+                {
+                    if (i == j) continue;
+
+                    if (context.Context == ContextsData[j].Context)
+                    {
+                        duplicateContexts = true;
+                        return;
+                    }
+                }
+            }
         }
 
         #endregion
