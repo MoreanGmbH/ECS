@@ -15,7 +15,7 @@ namespace ECS
     public struct ContextData
     {
 #if UNITY_EDITOR && ODIN_INSPECTOR
-        [OnValueChanged(nameof(ContextUpdated), true)]
+        [OnValueChanged(nameof(InitializeEntities), true)]
         [ValueDropdown(nameof(ContextNames))]
 #endif
         /// <summary>
@@ -24,13 +24,13 @@ namespace ECS
         public string Context;
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
-        [InfoBox("Component doesn't belong to selected Context!", InfoMessageType.Error,
+        [InfoBox("Component doesn't belong to the selected Context!", InfoMessageType.Error,
             nameof(componentNotInContext))]
 
         [InfoBox("Only one Component Type per Entity is allowed!", InfoMessageType.Error,
             nameof(duplicateComponents))]
 
-        [OnValueChanged(nameof(EntitiesUpdated), true)]
+        [OnValueChanged(nameof(ValidateEntities), true)]
 #endif
         /// <summary>
         /// Array of entity's components.
@@ -38,17 +38,15 @@ namespace ECS
         public IComponent[][] Entities;
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
-
         private bool componentNotInContext;
         private bool duplicateComponents;
-
 
         private IEnumerable<string> ContextNames()
             => Contexts.sharedInstance.allContexts.Select(context => context.contextInfo.name);
 
-        private void ContextUpdated() => Entities = new IComponent[1][];
+        private void InitializeEntities() => Entities = new IComponent[1][];
 
-        private void EntitiesUpdated()
+        private void ValidateEntities()
         {
             componentNotInContext = false;
             duplicateComponents = false;
@@ -78,7 +76,7 @@ namespace ECS
                 {
                     var componentType = entity[i].GetType();
 
-                    // Verify that component is in context
+                    // Verify that the component is in context
                     if (!this.GetContext().contextInfo.componentTypes.Contains(componentType))
                     {
                         componentNotInContext = true;
