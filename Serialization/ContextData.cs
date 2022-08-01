@@ -4,7 +4,6 @@ using Entitas;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 #endif
 
 namespace ECS
