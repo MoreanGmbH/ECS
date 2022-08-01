@@ -36,8 +36,7 @@ namespace ECS
 
         [PropertySpace(20), Button(ButtonSizes.Large)]
         [ShowIf(nameof(DataPathIsValid))]
-        private void SaveEntities()
-            => ContextsData.AddRange(Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath)));
+        private void SaveEntities() { }
 
         #endregion
 
@@ -51,7 +50,9 @@ namespace ECS
         private ValueDropdownList<ContextData> AvailableContexts()
         {
             var contexts = Contexts.sharedInstance.allContexts
-                .Where(context => context.contextInfo.componentTypes.Length > 0)
+                // Skip existing contexts and those without any component
+                .Where(context => !ContextsData.Any(contextData => contextData.Context == context.contextInfo.name)
+                    && context.contextInfo.componentTypes.Length > 0)
                 .Select(context => new ContextData()
                 {
                     Context = context.contextInfo.name,
