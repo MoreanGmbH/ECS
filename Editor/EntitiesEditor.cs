@@ -32,7 +32,33 @@ namespace ECS
         [FoldoutGroup("Load Entities"), PropertySpace(20), Button(ButtonSizes.Large)]
         [ShowIf(nameof(DataPathIsValid))]
         private void LoadEntities()
-            => ContextsData.AddRange(Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath)));
+        {
+            var contexts = Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath));
+            foreach (var context in contexts)
+            {
+                var contextId = -1;
+                for (int i = 0; i < ContextsData.Count; i++)
+                {
+                    if (context.Context == ContextsData[i].Context)
+                    {
+                        contextId = i;
+                        break;
+                    }
+                }
+
+                // Add entities to matching context
+                if (contextId != -1)
+                {
+                    var contextData = ContextsData[contextId];
+                    contextData.Entities = contextData.Entities.Union(context.Entities).ToArray();
+                    ContextsData[contextId] = contextData;
+                }
+                else
+                {
+                    ContextsData.Add(context);
+                }
+            }
+        }
 
         [PropertySpace(20), Button(ButtonSizes.Large)]
         [ShowIf(nameof(DataPathIsValid))]
