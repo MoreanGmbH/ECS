@@ -22,16 +22,14 @@ namespace ECS
 
         #region Load Entities
 
-        [FoldoutGroup("Load Entities"), PropertySpace]
-        [FilePath(Extensions = ".json")]
-        [InfoBox("Json file containing collection of contexts and their entities.", InfoMessageType.None)]
+        [HorizontalGroup("Load Entities", order: 0), PropertySpace]
+        [FilePath(Extensions = ".json, .bson"), LabelWidth(110)]
         public string EntitiesDataPath;
 
-        private bool DataPathIsValid() => !string.IsNullOrEmpty(EntitiesDataPath);
-
-        [FoldoutGroup("Load Entities"), PropertySpace(20), Button(ButtonSizes.Large)]
-        [ShowIf(nameof(DataPathIsValid))]
-        private void LoadEntities()
+        [HorizontalGroup("Load Entities", order: 0), Button]
+        [PropertySpace(SpaceAfter = 20), Indent(1)]
+        [DisableIf(nameof(DataPathIsNotValid))]
+        private void Load()
         {
             var contexts = Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath));
             foreach (var context in contexts)
@@ -60,16 +58,42 @@ namespace ECS
             }
         }
 
-        [PropertySpace(20), Button(ButtonSizes.Large)]
-        [ShowIf(nameof(DataPathIsValid))]
-        private void SaveEntities() { }
+        [ButtonGroup("Save Buttons", order: 1)]
+        [PropertySpace(SpaceBefore = 50), Button(ButtonSizes.Large)]
+        [DisableIf(nameof(DataIsNotValid))]
+        private void SaveAsJson()
+        {
+            var path = GetSaveFilePath("json");
+            if (string.IsNullOrEmpty(path)) return;
+
+            File.WriteAllText(path, Context.SerializeContextsData(Newtonsoft.Json.Formatting.Indented, ContextsData.ToArray()));
+        }
+
+        [ButtonGroup("Save Buttons", order: 1)]
+        [PropertySpace(SpaceBefore = 50, SpaceAfter = 50), Button(ButtonSizes.Large)]
+        [DisableIf(nameof(DataIsNotValid))]
+        private void SaveAsBson() { }
+
+        private string GetSaveFilePath(string format)
+            => UnityEditor.EditorUtility.SaveFilePanel(
+                title: $"Save Contexts and Entities as {format.ToUpper()}",
+                directory: UnityEngine.Application.dataPath,
+                defaultName: $"Entities.{format}",
+                extension: format);
+
+        private bool DataPathIsNotValid()
+            => string.IsNullOrEmpty(EntitiesDataPath)
+            || !File.Exists(EntitiesDataPath);
+
+        private bool DataIsNotValid()
+            => ContextsData.Count < 1
+            || !ContextsData.TrueForAll(contextData => contextData.IsValid());
 
         #endregion
 
         #region Entities
 
-        [PropertySpace(20)]
-        [LabelText(nameof(Contexts))]
+        [PropertySpace(20), PropertyOrder(2), LabelText(nameof(Contexts))]
         [ValueDropdown(nameof(AvailableContexts), ExcludeExistingValuesInList = true, DrawDropdownForListElements = false)]
         public List<ContextData> ContextsData = new List<ContextData>();
 

@@ -139,8 +139,15 @@ namespace ECS
                 serializedContexts[i] = serializedContext;
             }
 
-            return JsonConvert.SerializeObject(serializedContexts, formatting, serializerSettings);
+            return SerializeContextsData(formatting, serializedContexts);
         }
+
+        /// <summary>
+        /// Serialize all entities in <paramref name="contextsData"/> to Json.
+        /// </summary>
+        /// <param name="formatting">Json formatting.</param>
+        public static string SerializeContextsData(Formatting formatting = Formatting.None, params ContextData[] contextsData)
+            => JsonConvert.SerializeObject(contextsData, formatting, serializerSettings);
 
         /// <summary>
         /// Deserialize <see cref="ContextData"/> from json data.

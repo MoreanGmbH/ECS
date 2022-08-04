@@ -42,7 +42,10 @@ namespace ECS
         public IComponent[][] Entities;
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
+        [UnityEngine.HideInInspector]
         private bool duplicateComponents;
+
+        public bool IsValid() => !duplicateComponents;
 
         private IEnumerable<IComponent> Components()
         {
