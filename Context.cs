@@ -1,6 +1,7 @@
 ﻿#if ECS
 using Entitas;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 
@@ -94,11 +95,15 @@ namespace ECS
         };
 
         /// <summary>
-        /// Deserialize contexts from Json data and create their entities.
+        /// Deserialize contexts from Json or Bson data and create their entities.
         /// </summary>
-        public static void LoadEntities(string data)
+        /// <param name="json">From Json if True, from Bson otherwise.</param>
+        public static void LoadEntities(string data, bool json = true)
         {
-            foreach (var contextData in DeserializeContexs(data))
+            var contextsData = json ? DeserializeContexsFromJson(data)
+                : DeserializeContexsFromJson(data);
+
+            foreach (var contextData in contextsData)
             {
                 contextData.GetContext().CreateEntities(contextData.Entities);
             }
@@ -108,7 +113,8 @@ namespace ECS
         /// Serialize all entities in <paramref name="contexts"/> to Json.
         /// </summary>
         /// <param name="formatting">Json formatting.</param>
-        public static string SerializeContexts(Formatting formatting = Formatting.None, params IContext[] contexts)
+        /// <param name="json">To Json if True, to Bson otherwise.</param>
+        public static string SerializeContexts(Formatting formatting = Formatting.None, bool json = true, params IContext[] contexts)
         {
             var serializedContexts = new ContextData[contexts.Length];
             for (int i = 0; i < serializedContexts.Length; i++)
@@ -139,21 +145,49 @@ namespace ECS
                 serializedContexts[i] = serializedContext;
             }
 
-            return SerializeContextsData(formatting, serializedContexts);
+            return json ? SerializeContextsDataToJson(formatting, serializedContexts)
+                : SerializeContextsDataToBson(serializedContexts);
         }
 
         /// <summary>
         /// Serialize all entities in <paramref name="contextsData"/> to Json.
         /// </summary>
         /// <param name="formatting">Json formatting.</param>
-        public static string SerializeContextsData(Formatting formatting = Formatting.None, params ContextData[] contextsData)
+        public static string SerializeContextsDataToJson(Formatting formatting = Formatting.None, params ContextData[] contextsData)
             => JsonConvert.SerializeObject(contextsData, formatting, serializerSettings);
 
         /// <summary>
-        /// Deserialize <see cref="ContextData"/> from json data.
+        /// Serialize all entities in <paramref name="contextsData"/> to Bson.
         /// </summary>
-        public static ContextData[] DeserializeContexs(string data)
-            => JsonConvert.DeserializeObject<ContextData[]>(data, serializerSettings);
+        public static string SerializeContextsDataToBson(params ContextData[] contextsData)
+        {
+            var memoryStream = new System.IO.MemoryStream();
+            using (var writer = new BsonWriter(memoryStream))
+            {
+                new JsonSerializer().Serialize(writer, contextsData);
+            }
+            return Convert.ToBase64String(memoryStream.ToArray());
+        }
+
+        /// <summary>
+        /// Deserialize <see cref="ContextData"/> from Json data.
+        /// </summary>
+        public static ContextData[] DeserializeContexsFromJson(string data)
+        => JsonConvert.DeserializeObject<ContextData[]>(data, serializerSettings);
+
+        /// <summary>
+        /// Deserialize <see cref="ContextData"/> from Bson data.
+        /// </summary>
+        public static ContextData[] DeserializeContexsFromBson(string data)
+        {
+            var byteData = Convert.FromBase64String(data);
+            var memoryStream = new System.IO.MemoryStream(byteData);
+            using (var reader = new BsonReader(memoryStream))
+            {
+                reader.ReadRootValueAsArray = true;
+                return new JsonSerializer().Deserialize<ContextData[]>(reader);
+            }
+        }
 
         #endregion Serialization / Deserialization
     }

@@ -31,7 +31,9 @@ namespace ECS
         [DisableIf(nameof(DataPathIsNotValid))]
         private void Load()
         {
-            var contexts = Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath));
+            var contexts = Path.GetExtension(EntitiesDataPath) == ".json" ? Context.DeserializeContexsFromJson(File.ReadAllText(EntitiesDataPath))
+                : Context.DeserializeContexsFromBson(File.ReadAllText(EntitiesDataPath));
+
             foreach (var context in contexts)
             {
                 var contextId = -1;
@@ -66,13 +68,18 @@ namespace ECS
             var path = GetSaveFilePath("json");
             if (string.IsNullOrEmpty(path)) return;
 
-            File.WriteAllText(path, Context.SerializeContextsData(Newtonsoft.Json.Formatting.Indented, ContextsData.ToArray()));
+            File.WriteAllText(path, Context.SerializeContextsDataToJson(Newtonsoft.Json.Formatting.Indented, ContextsData.ToArray()));
         }
 
         [ButtonGroup("Save Buttons", order: 1)]
         [PropertySpace(SpaceBefore = 50, SpaceAfter = 50), Button(ButtonSizes.Large)]
         [DisableIf(nameof(DataIsNotValid))]
-        private void SaveAsBson() { }
+        private void SaveAsBson() {
+            var path = GetSaveFilePath("bson");
+            if (string.IsNullOrEmpty(path)) return;
+
+            File.WriteAllText(path, Context.SerializeContextsDataToBson(ContextsData.ToArray()));
+        }
 
         private string GetSaveFilePath(string format)
             => UnityEditor.EditorUtility.SaveFilePanel(
