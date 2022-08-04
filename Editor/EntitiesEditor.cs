@@ -23,11 +23,10 @@ namespace ECS
         #region Load Entities
 
         [HorizontalGroup("Load Entities", order: 0), PropertySpace]
-        [FilePath(Extensions = ".json, .bson"), LabelWidth(110)]
+        [FilePath(Extensions = ".json"), LabelWidth(110)]
         public string EntitiesDataPath;
 
-        [HorizontalGroup("Load Entities", order: 0), Button]
-        [PropertySpace(SpaceAfter = 20), Indent(1)]
+        [HorizontalGroup("Load Entities", order: 0), Button, Indent(1)]
         [DisableIf(nameof(DataPathIsNotValid))]
         private void Load()
         {
@@ -58,28 +57,22 @@ namespace ECS
             }
         }
 
-        [ButtonGroup("Save Buttons", order: 1)]
-        [PropertySpace(SpaceBefore = 50), Button(ButtonSizes.Large)]
+        [PropertyOrder(1)]
+        [PropertySpace(SpaceBefore = 20), Button(ButtonSizes.Large)]
         [DisableIf(nameof(DataIsNotValid))]
-        private void SaveAsJson()
+        private void Save()
         {
-            var path = GetSaveFilePath("json");
-            if (string.IsNullOrEmpty(path)) return;
-
-            File.WriteAllText(path, Context.SerializeContextsData(Newtonsoft.Json.Formatting.Indented, ContextsData.ToArray()));
-        }
-
-        [ButtonGroup("Save Buttons", order: 1)]
-        [PropertySpace(SpaceBefore = 50, SpaceAfter = 50), Button(ButtonSizes.Large)]
-        [DisableIf(nameof(DataIsNotValid))]
-        private void SaveAsBson() { }
-
-        private string GetSaveFilePath(string format)
-            => UnityEditor.EditorUtility.SaveFilePanel(
+            var format = "json";
+            var path = UnityEditor.EditorUtility.SaveFilePanel(
                 title: $"Save Contexts and Entities as {format.ToUpper()}",
                 directory: UnityEngine.Application.dataPath,
                 defaultName: $"Entities.{format}",
                 extension: format);
+            if (string.IsNullOrEmpty(path)) return;
+
+            File.WriteAllText(path, 
+                Context.SerializeContextsData(Newtonsoft.Json.Formatting.Indented, ContextsData.ToArray()));
+        }
 
         private bool DataPathIsNotValid()
             => string.IsNullOrEmpty(EntitiesDataPath)
