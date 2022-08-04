@@ -26,7 +26,8 @@ namespace ECS
         [FilePath(Extensions = ".json"), LabelWidth(110)]
         public string EntitiesDataPath;
 
-        [HorizontalGroup("Load Entities", order: 0), Button, Indent(1)]
+        [HorizontalGroup("Load Entities", order: 0), Button]
+        [PropertySpace(SpaceAfter = 20), Indent(1)]
         [DisableIf(nameof(DataPathIsNotValid))]
         private void Load()
         {
@@ -57,8 +58,7 @@ namespace ECS
             }
         }
 
-        [PropertyOrder(1)]
-        [PropertySpace(SpaceBefore = 20), Button(ButtonSizes.Large)]
+        [PropertyOrder(1), Button(ButtonSizes.Large)]
         [DisableIf(nameof(DataIsNotValid))]
         private void Save()
         {
