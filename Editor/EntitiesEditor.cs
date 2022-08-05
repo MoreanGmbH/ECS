@@ -20,18 +20,20 @@ namespace ECS
             window.position = GUIHelper.GetEditorWindowRect().AlignCenter(700, 700);
         }
 
-        #region Load Entities
+        #region Load and Save Entities
 
-        [HorizontalGroup("Load Entities", order: 0), PropertySpace]
-        [FilePath(Extensions = ".json"), LabelWidth(110)]
-        public string EntitiesDataPath;
+        private string format = "json";
 
-        [HorizontalGroup("Load Entities", order: 0), Button]
-        [PropertySpace(SpaceAfter = 20), Indent(1)]
-        [DisableIf(nameof(DataPathIsNotValid))]
+        [HorizontalGroup("Load Entities", order: 0)]
+        [FilePath(Extensions = "$format"), PropertySpace, LabelWidth(70)]
+        public string EntitiesFile;
+
+        [HorizontalGroup("Load Entities", order: 0)]
+        [Button, PropertySpace(SpaceAfter = 20)]
+        [DisableIf(nameof(FileIsNotValid))]
         private void Load()
         {
-            var contexts = Context.DeserializeContexs(File.ReadAllText(EntitiesDataPath));
+            var contexts = Context.DeserializeContexs(File.ReadAllText(EntitiesFile));
             foreach (var context in contexts)
             {
                 var contextId = -1;
@@ -62,7 +64,6 @@ namespace ECS
         [DisableIf(nameof(DataIsNotValid))]
         private void Save()
         {
-            var format = "json";
             var path = UnityEditor.EditorUtility.SaveFilePanel(
                 title: $"Save Contexts and Entities as {format.ToUpper()}",
                 directory: UnityEngine.Application.dataPath,
@@ -70,13 +71,12 @@ namespace ECS
                 extension: format);
             if (string.IsNullOrEmpty(path)) return;
 
-            File.WriteAllText(path, 
-                Context.SerializeContextsData(Newtonsoft.Json.Formatting.Indented, ContextsData.ToArray()));
+            File.WriteAllText(path, Context.SerializeContextsData(contextsData: ContextsData.ToArray()));
         }
 
-        private bool DataPathIsNotValid()
-            => string.IsNullOrEmpty(EntitiesDataPath)
-            || !File.Exists(EntitiesDataPath);
+        private bool FileIsNotValid()
+            => string.IsNullOrEmpty(EntitiesFile)
+            || !File.Exists(EntitiesFile);
 
         private bool DataIsNotValid()
             => ContextsData.Count < 1
