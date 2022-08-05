@@ -4,10 +4,7 @@ using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
-using System.Collections.Generic;
-using Entitas;
 using System;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace ECS
@@ -24,27 +21,60 @@ namespace ECS
         #region Validate Entities
 
         private string format = "json";
-
-        [HorizontalGroup("Validate Entities", order: 0)]
-        [FilePath(Extensions = "$format"), PropertySpace, LabelWidth(70)]
-        public string EntitiesFile;
-
         private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.Auto,
         };
+
+        private bool triedValidating = false;
+        private bool isValid = false;
+        private bool canFix = false;
+
+        ContextData[] contexts;
+
+        [HorizontalGroup("Validate Entities", order: 0)]
+        [FilePath(Extensions = "$format"), PropertySpace, LabelWidth(70)]
+        [OnValueChanged("@this.triedValidating = this.isValid = false")]
+        public string EntitiesFile;
+
+        [GUIColor("@this.FileIsValid.GetColor()")]
+        [ShowIf(nameof(CanShowConditions))]
+        public Condition FileIsValid = new Condition();
+
+        [GUIColor("@this.ContextsAreValid.GetColor()")]
+        [ShowIf(nameof(CanShowConditions))]
+        public Condition ContextsAreValid = new Condition();
+
+        [GUIColor("@this.EntitiesAreValid.GetColor()")]
+        [ShowIf(nameof(CanShowConditions))]
+        public Condition EntitiesAreValid = new Condition();
+
+        [GUIColor("@this.ComponentsAreValid.GetColor()")]
+        [ShowIf(nameof(CanShowConditions))]
+        public Condition ComponentsAreValid = new Condition();
+
+        private bool CanShowConditions()
+            => !FileIsNotValid() && triedValidating;
+
+        private bool FileIsNotValid()
+            => string.IsNullOrEmpty(EntitiesFile)
+            || !File.Exists(EntitiesFile);
 
         [HorizontalGroup("Validate Entities", order: 0)]
         [Button, PropertySpace(SpaceAfter = 10)]
         [DisableIf(nameof(FileIsNotValid))]
         private void Validate()
         {
+            triedValidating = true;
+            isValid = false;
+            canFix = true;
+
             FileIsValid.Valid = true;
             ContextsAreValid.Valid = true;
             EntitiesAreValid.Valid = true;
             ComponentsAreValid.Valid = true;
 
-            ContextData[] contexts;
+            contexts = null;
 
             // Verify that the file can be deserialized
             try
@@ -55,6 +85,7 @@ namespace ECS
             {
                 FileIsValid.Issue = $"File [{EntitiesFile}] is not valid: {exception.Message}";
                 FileIsValid.Valid = false;
+                canFix = false;
                 return;
             }
 
@@ -66,6 +97,7 @@ namespace ECS
                 {
                     ContextsAreValid.Issue = $"Context {context.Context} at position [{c}] is not valid!";
                     ContextsAreValid.Valid = false;
+                    canFix = false;
                     return;
                 }
                 // Verify that Context exists
@@ -143,26 +175,19 @@ namespace ECS
                     }
                 }
             }
+
+            isValid = true;
         }
 
-        [GUIColor("@this.FileIsValid.GetColor()")]
-        public Condition FileIsValid = new Condition();
-
-        [GUIColor("@this.ContextsAreValid.GetColor()")]
-        public Condition ContextsAreValid = new Condition();
-
-        [GUIColor("@this.EntitiesAreValid.GetColor()")]
-        public Condition EntitiesAreValid = new Condition();
-
-        [GUIColor("@this.ComponentsAreValid.GetColor()")]
-        public Condition ComponentsAreValid = new Condition();
-
-        private bool FileIsNotValid()
-            => string.IsNullOrEmpty(EntitiesFile)
-            || !File.Exists(EntitiesFile);
-
+        [Button(ButtonSizes.Large), PropertySpace(20)]
+        [ShowIf("@triedValidating && !isValid && canFix")]
+        private void Fix()
+        {
+            var entitiesEditor = new EntitiesEditor();
+            entitiesEditor.ContextsData.AddRange(contexts);
+            entitiesEditor.Show();
+        }
         #endregion
     }
 }
-
 #endif
