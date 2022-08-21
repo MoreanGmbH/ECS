@@ -1,4 +1,5 @@
 ﻿#if ECS
+using Asset;
 using Entitas;
 using Newtonsoft.Json;
 using System;
@@ -96,8 +97,11 @@ namespace ECS
         /// <summary>
         /// Deserialize contexts from Json data and create their entities.
         /// </summary>
-        public static void LoadEntities(string data)
+        public static async void LoadEntitiesAsync(string key)
         {
+            if (!await key.ResourceExists<UnityEngine.TextAsset>()) return;
+
+            var data = (await key.LoadAsset<UnityEngine.TextAsset>()).text;
             foreach (var contextData in DeserializeContexs(data))
             {
                 contextData.GetContext().CreateEntities(contextData.Entities);

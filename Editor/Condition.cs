@@ -1,13 +1,6 @@
 #if ODIN_INSPECTOR && ECS
-using System.IO;
-using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using Sirenix.OdinInspector;
-using Sirenix.Utilities;
-using System.Collections.Generic;
-using Entitas;
-using System;
-using System.Linq;
 using UnityEngine;
 
 namespace ECS

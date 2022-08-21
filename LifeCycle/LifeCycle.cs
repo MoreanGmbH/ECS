@@ -47,7 +47,7 @@ namespace ECS
         /// <summary>
         /// Tear down life cycle by cleaning up systems, destroying entites and cleanning up contexts.
         /// </summary>
-        public async void TearDown()
+        public void TearDown()
         {
             if (isTearingDown) return;
 
@@ -55,8 +55,6 @@ namespace ECS
 
             systems.TearDown();
             systems.DeactivateReactiveSystems();
-
-            await System.Threading.Tasks.Task.Delay(1000);
 
             // Destroys all entities and resets creationIndex back to 0
             contexts.Reset();
