@@ -1,4 +1,4 @@
-#if TESTS && ECS
+#if TEST && ECS
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace ECS
 {
-    public static class ECSTests
+    public static class Tests
     {
         /// <summary>
         /// Timeout in Milliseconds until a task is deemed as finished.
