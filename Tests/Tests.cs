@@ -1,6 +1,7 @@
 #if TEST && ECS
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,13 +12,13 @@ namespace ECS
         /// <summary>
         /// Timeout in Milliseconds until a task is deemed as finished.
         /// </summary>
-        public const int Timeout = 1000;
+        private const int timeout = 1000;
 
         /// <summary>
         /// Interval in milliseconds at which the task will check its condition
-        /// until <see cref="Timeout"/> is reached.
+        /// until <see cref="timeout"/> is reached.
         /// </summary>
-        public const int Interval = 100;
+        private const int interval = 100;
 
         /// <summary>
         /// Scene index containing <see cref="LifeCycleController"/>.
@@ -36,6 +37,24 @@ namespace ECS
             {
                 await SceneManager.LoadSceneAsync(lifeCycleScene);
             };
+        }
+
+        /// <summary>
+        /// Try validating <paramref name="condition"/> until <see cref="timeout"/>.
+        /// </summary>
+        /// <param name="condition"><see cref="delegate"/> that returns bool.</param>
+        /// <returns>Returns true if <paramref name="condition"/> is valid, false otherwise.</returns>
+        public static async UniTask Validate(this Func<bool> condition)
+        {
+            var startTime = DateTime.Now;
+            while (!condition())
+            {
+                await UniTask.Delay(interval);
+                if ((DateTime.Now - startTime).TotalMilliseconds > timeout)
+                {
+                    break;
+                }
+            }
         }
     }
 }
