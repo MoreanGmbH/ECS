@@ -23,7 +23,7 @@ namespace ECS
         /// <summary>
         /// Scene index containing <see cref="LifeCycleController"/>.
         /// </summary>
-        private const string lifeCycleScene = "LifeCycle";
+        private const string lifeCycleScene = nameof(LifeCycle);
 
         /// <summary>
         /// Will load the Backend Secene and initialize backend service providers.
