@@ -11,7 +11,8 @@ namespace ECS
     /// </summary>
     public static class Entity
     {
-        #region Components
+        public static bool HasComponent(this IEntity entity, IComponent component)
+            => entity.HasComponent(Array.IndexOf(entity.contextInfo.componentTypes, component.GetType()));
 
         /// <summary>
         /// Add <paramref name="components"/> to <paramref name="entity"/>.
@@ -128,8 +129,6 @@ namespace ECS
             }
             return indices.ToArray();
         }
-
-        #endregion Components
     }
-} 
+}
 #endif
