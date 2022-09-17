@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 namespace ECS
 {
-    public static class Tests
+    public static class TestExtensions
     {
         /// <summary>
         /// Timeout in Milliseconds until a task is deemed as finished.
