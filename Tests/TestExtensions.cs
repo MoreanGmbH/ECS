@@ -43,8 +43,9 @@ namespace ECS
         /// Try validating <paramref name="condition"/> until <see cref="timeout"/>.
         /// </summary>
         /// <param name="condition"><see cref="delegate"/> that returns bool.</param>
+        /// <param name="message">Message to show in case the <paramref name="condition"/> fails.</param>
         /// <returns>True if <paramref name="condition"/> is valid, False otherwise.</returns>
-        public static async UniTask Validate(Func<bool> condition)
+        public static async UniTask Validate(Func<bool> condition, string message)
         {
             var startTime = DateTime.Now;
             while (!condition())
@@ -55,6 +56,7 @@ namespace ECS
                     break;
                 }
             }
+            Assert.IsTrue(condition(), message);
         }
 
 
@@ -62,8 +64,9 @@ namespace ECS
         /// Try validating <paramref name="condition"/> until <see cref="timeout"/>.
         /// </summary>
         /// <param name="condition"><see cref="UniTask"/> <see cref="delegate"/> that returns bool.</param>
+        /// <param name="message">Message to show in case the <paramref name="condition"/> fails.</param>
         /// <returns>True if <paramref name="condition"/> is valid, False otherwise.</returns>
-        public static async UniTask Validate(this Func<UniTask<bool>> condition)
+        public static async UniTask Validate(Func<UniTask<bool>> condition, string message)
         {
             var startTime = DateTime.Now;
             var passed = await condition.Invoke();
@@ -77,6 +80,7 @@ namespace ECS
 
                 passed = await condition.Invoke();
             }
+            Assert.IsTrue(passed, message);
         }
     }
 }
