@@ -3,7 +3,7 @@ using Entitas;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using static Morean.Asset.Extensions;
+using static Morean.Assets.Extensions;
 
 namespace Morean.ECS
 {
