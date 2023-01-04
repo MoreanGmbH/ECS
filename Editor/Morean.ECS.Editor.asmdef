@@ -1,9 +1,7 @@
 {
-    "name": "ECS.Editor",
+    "name": "Morean.ECS.Editor",
     "rootNamespace": "",
-    "references": [
-        "GUID:20106f1cc45e2764999eb5340360d6d4"
-    ],
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],

@@ -1,5 +1,5 @@
-#if ECS
-namespace ECS
+#if MOREAN_ECS
+namespace Morean.ECS
 {
     public class LifeCycle
     {

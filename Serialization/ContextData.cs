@@ -1,4 +1,4 @@
-#if ECS
+#if MOREAN_ECS
 using Entitas;
 #if UNITY_EDITOR && ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 #endif
 
-namespace ECS
+namespace Morean.ECS
 {
     /// <summary>
     /// Structure to be used when serializing / deserializing an entity to / from json.

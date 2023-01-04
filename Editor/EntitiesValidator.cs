@@ -1,4 +1,4 @@
-#if ODIN_INSPECTOR && ECS
+#if ODIN_INSPECTOR && MOREAN_ECS
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using Sirenix.OdinInspector;
@@ -6,7 +6,7 @@ using Sirenix.Utilities;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ECS
+namespace Morean.ECS
 {
     public class EntitiesValidator : OdinEditorWindow
     {

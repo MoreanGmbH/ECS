@@ -1,9 +1,9 @@
-#if ODIN_INSPECTOR && ECS
+#if ODIN_INSPECTOR && MOREAN_ECS
 using Sirenix.Utilities.Editor;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace ECS
+namespace Morean.ECS
 {
     [PropertySpace(10), HideReferenceObjectPicker]
     [Toggle(nameof(Valid), CollapseOthersOnExpand = false)]

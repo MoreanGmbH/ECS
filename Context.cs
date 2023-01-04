@@ -1,11 +1,11 @@
-﻿#if ECS
-using Asset;
+﻿#if MOREAN_ECS
 using Entitas;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using static Morean.Asset.Extensions;
 
-namespace ECS
+namespace Morean.ECS
 {
     /// <summary>
     /// Provides <see cref="IContexts"/> related utilities such as creating entities

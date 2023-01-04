@@ -1,9 +1,9 @@
-﻿#if ECS
+﻿#if MOREAN_ECS
 using Entitas;
 using System;
 using System.Collections.Generic;
 
-namespace ECS
+namespace Morean.ECS
 {
     /// <summary>
     /// Provides <see cref="Entitas.Entity"/> related utilities such as

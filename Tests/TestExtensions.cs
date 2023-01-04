@@ -1,11 +1,11 @@
-#if TEST && ECS
+#if TEST && MOREAN_ECS
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace ECS
+namespace Morean.ECS
 {
     public static class TestExtensions
     {

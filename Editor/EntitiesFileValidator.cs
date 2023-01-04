@@ -1,10 +1,10 @@
-#if ODIN_INSPECTOR && ECS
+#if ODIN_INSPECTOR && MOREAN_ECS
 using System.IO;
 using Sirenix.OdinInspector;
 using System;
 using Newtonsoft.Json;
 
-namespace ECS
+namespace Morean.ECS
 {
     public class EntitiesFileValidator
     {
