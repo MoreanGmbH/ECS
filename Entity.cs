@@ -2,6 +2,7 @@
 using Entitas;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Morean.ECS
 {
@@ -13,6 +14,18 @@ namespace Morean.ECS
     {
         public static bool HasComponent(this IEntity entity, IComponent component)
             => entity.HasComponent(Array.IndexOf(entity.contextInfo.componentTypes, component.GetType()));
+
+        public static Type GetComponent(string name)
+        {
+            foreach (var type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()))
+            {
+                if (typeof(IComponent).IsAssignableFrom(type) && !type.IsInterface && type.Name == name)
+                {
+                    return type;
+                }
+            }
+            return null; // SHOULD NEVER HAPPEN
+        }
 
         /// <summary>
         /// Add <paramref name="components"/> to <paramref name="entity"/>.
