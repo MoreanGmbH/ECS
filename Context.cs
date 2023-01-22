@@ -99,13 +99,12 @@ namespace Morean.ECS
         /// </summary>
         public static async void LoadEntitiesAsync(string key)
         {
-            if (!await key.ResourceExists<UnityEngine.TextAsset>()) return;
-
-            var data = (await key.LoadAsset<UnityEngine.TextAsset>()).text;
-            foreach (var contextData in DeserializeContexs(data))
+            var data = await key.LoadAsset<UnityEngine.TextAsset>();
+            foreach (var contextData in DeserializeContexs(data.Value.text))
             {
                 contextData.GetContext().CreateEntities(contextData.Entities);
             }
+            data.Key.Unload();
         }
 
         /// <summary>
