@@ -104,7 +104,7 @@ namespace Morean.ECS
             {
                 contextData.GetContext().CreateEntities(contextData.Entities);
             }
-            data.Key.Unload();
+            data.Key.UnloadAsset();
         }
 
         /// <summary>
