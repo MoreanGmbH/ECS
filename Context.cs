@@ -95,16 +95,16 @@ namespace Morean.ECS
         };
 
         /// <summary>
-        /// Deserialize contexts from Json data and create their entities.
+        /// Deserialize contexts from Json asset and create their entities.
         /// </summary>
         public static async void LoadEntitiesAsync(string key)
         {
-            var data = await key.LoadAsset<UnityEngine.TextAsset>();
-            foreach (var contextData in DeserializeContexs(data.Value.text))
+            var asset = await key.LoadAsset<UnityEngine.TextAsset>();
+            foreach (var contextData in DeserializeContexs(asset.Value.text))
             {
                 contextData.GetContext().CreateEntities(contextData.Entities);
             }
-            data.Key.UnloadAsset();
+            asset.Key.UnloadAsset();
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace Morean.ECS
             => JsonConvert.SerializeObject(contextsData, formatting, serializerSettings);
 
         /// <summary>
-        /// Deserialize <see cref="ContextData"/> from json data.
+        /// Deserialize <see cref="ContextData"/> from json asset.
         /// </summary>
         public static ContextData[] DeserializeContexs(string data)
             => JsonConvert.DeserializeObject<ContextData[]>(data, serializerSettings);
